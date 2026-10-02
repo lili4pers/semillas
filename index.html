@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Semillas y Manías – Inventario</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f2f0e8;--card:#fff;--ink:#2a1d14;--mut:#7a6a5c;--line:#ddd6c8;--acc:#7c9a1e;--accink:#fff;--warn:#c4571f;--soft:#e9efce}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1511;--card:#27201a;--ink:#f3ece1;--mut:#a8998a;--line:#3b3128;--acc:#a9c93a;--accink:#1b1511;--warn:#ee8a52;--soft:#34391d}}
+:root[data-theme="dark"]{--bg:#1b1511;--card:#27201a;--ink:#f3ece1;--mut:#a8998a;--line:#3b3128;--acc:#a9c93a;--accink:#1b1511;--warn:#ee8a52;--soft:#34391d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;line-height:1.45}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.btn{background:var(--acc);color:var(--accink);border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--warn);border:1px solid var(--warn)}
+.btn.sm{padding:6px 10px}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.lbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;width:100%;max-width:360px;display:grid;gap:12px}
+.lbox h1{font-size:28px}
+.err{color:var(--warn);font-size:14px;min-height:20px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+header h2{font-size:18px}
+.menu{position:relative}
+.menu>button{background:var(--acc);color:var(--accink);border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer}
+.drop{position:absolute;right:0;top:46px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;min-width:190px;display:none;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.drop.open{display:block}
+.drop button{display:block;width:100%;text-align:left;background:none;border:0;padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--line)}
+.drop button:last-child{border:0}
+.drop button:hover,.drop button.on{background:var(--soft)}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+main>h1{font-size:26px;margin-bottom:4px}
+.sub{color:var(--mut);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.card .ph{aspect-ratio:1;background:var(--soft);display:grid;place-items:center;color:var(--mut);font-size:13px;cursor:pointer;position:relative;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .body{padding:12px;display:grid;gap:8px}
+.qty{font-size:30px;font-family:Georgia,serif;font-weight:700}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--soft)}
+.tag.low{background:var(--warn);color:#fff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row.sp{justify-content:space-between}
+.draft{display:grid;grid-template-columns:150px 1fr;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.draft .ph{aspect-ratio:1;border-radius:8px;background:var(--soft);display:grid;place-items:center;text-align:center;font-size:13px;color:var(--mut);cursor:pointer;overflow:hidden}
+.draft .ph img{width:100%;height:100%;object-fit:cover}
+.f{display:grid;gap:8px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plus{width:100%;border:2px dashed var(--acc);background:transparent;border-radius:12px;padding:14px;font-size:22px;font-weight:700;color:var(--acc);cursor:pointer;margin-bottom:14px}
+.asg{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.asg img{width:40px;height:40px;object-fit:cover;border-radius:6px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;z-index:9}
+@media(max-width:560px){.draft{grid-template-columns:1fr}.draft .ph{max-width:200px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const K='semillas_v1';
+let S={p:[],c:[],a:[]},D=[{}],page='inv',auth=false,q='',err='',menu=false,fc='';
+try{const r=localStorage.getItem(K);if(r)S=JSON.parse(r)}catch(e){}
+try{auth=sessionStorage.getItem('adm')==='1'}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(S));return true}catch(e){toast('No hay espacio: usa fotos más pequeñas o elimina productos.');return false}}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'Q'+Number(n||0).toFixed(2);
+const fmt=t=>new Date(t).toLocaleString('es-GT',{dateStyle:'medium',timeStyle:'short'});
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800)}
+function login(){
+  const u=$('#u').value.trim(),p=$('#p').value;
+  if(u==='Admin'&&p==='Admin2026'){auth=true;err='';try{sessionStorage.setItem('adm','1')}catch(e){}}
+  else err='Usuario o contraseña incorrectos.';
+  render();
+}
+function logout(){auth=false;menu=false;try{sessionStorage.removeItem('adm')}catch(e){}render()}
+function go(p){page=p;menu=false;render()}
+function pickImg(i){const f=document.createElement('input');f.type='file';f.accept='image/*';
+  f.onchange=()=>{const file=f.files[0];if(!file)return;const rd=new FileReader();
+    rd.onload=()=>{const im=new Image();im.onload=()=>{const m=420,s=Math.min(1,m/Math.max(im.width,im.height));
+      const c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      if(i==='n'){return}
+      D[i].img=c.toDataURL('image/jpeg',.72);render()};im.src=rd.result};rd.readAsDataURL(file)};
+  f.click()}
+function setD(i,k,v){D[i][k]=v}
+function addDraft(){D.push({});render()}
+function delDraft(i){D.splice(i,1);if(!D.length)D=[{}];render()}
+function saveAll(){
+  const ok=D.filter(d=>d.title&&d.title.trim());
+  if(!ok.length){toast('Escribe al menos un título.');return}
+  for(const d of ok){if(d.price===undefined||d.price===''||isNaN(d.price)){toast('Falta el precio de "'+d.title+'".');return}}
+  ok.forEach((d,i)=>S.p.push({id:Date.now()+i,img:d.img||'',title:d.title.trim(),desc:(d.desc||'').trim(),price:+d.price,qty:Math.max(0,parseInt(d.qty)||0)}));
+  if(save()){D=[{}];toast(ok.length+' producto(s) guardado(s).');page='stock';render()}else{S.p.splice(S.p.length-ok.length)}
+}
+function adj(id,n){const p=S.p.find(x=>x.id===id);p.qty=Math.max(0,p.qty+n);save();render()}
+function delP(id){if(confirm('¿Eliminar este producto?')){S.p=S.p.filter(x=>x.id!==id);save();render()}}
+function addC(){const n=$('#cn').value.trim();if(!n){toast('Escribe el nombre del cliente.');return}
+  S.c.push({id:Date.now(),name:n,tel:$('#ct').value.trim()});save();render()}
+function delC(id){if(confirm('¿Eliminar cliente y su historial?')){S.c=S.c.filter(x=>x.id!==id);S.a=S.a.filter(x=>x.cid!==id);save();render()}}
+function assign(cid){
+  const pid=+$('#sp'+cid).value,n=parseInt($('#sq'+cid).value)||0,p=S.p.find(x=>x.id===pid);
+  if(!p){toast('Elige un producto.');return}
+  if(n<1){toast('La cantidad debe ser 1 o más.');return}
+  if(n>p.qty){toast('Solo quedan '+p.qty+' de "'+p.title+'".');return}
+  p.qty-=n;S.a.unshift({id:Date.now(),cid,pid,qty:n,price:p.price,t:Date.now()});
+  save();toast('Asignado: '+n+' × '+p.title);render()
+}
+function viewInv(){
+  return `<h1>Inventario</h1><p class="sub">Sube la foto, escribe los datos y usa + para agregar otro producto antes de guardar.</p>
+  ${D.map((d,i)=>`<div class="draft"><div class="ph" onclick="pickImg(${i})" tabindex="0" role="button" aria-label="Subir foto">${d.img?`<img src="${d.img}" alt="">`:'Toca para subir foto'}</div>
+  <div class="f"><input placeholder="Título del producto (ej. Maní con limón)" value="${esc(d.title)}" oninput="setD(${i},'title',this.value)">
+  <textarea rows="2" placeholder="Descripción" oninput="setD(${i},'desc',this.value)">${esc(d.desc)}</textarea>
+  <div class="f2"><input type="number" min="0" step="0.01" placeholder="Precio (Q)" value="${esc(d.price)}" oninput="setD(${i},'price',this.value)">
+  <input type="number" min="0" placeholder="Cantidad en stock" value="${esc(d.qty)}" oninput="setD(${i},'qty',this.value)"></div>
+  ${D.length>1?`<div><button class="btn danger sm" onclick="delDraft(${i})">Quitar</button></div>`:''}</div></div>`).join('')}
+  <button class="plus" onclick="addDraft()" aria-label="Agregar otro producto">+</button>
+  <button class="btn" onclick="saveAll()">Guardar productos</button>`}
+function viewStock(){
+  const l=S.p.filter(p=>p.title.toLowerCase().includes(q.toLowerCase()));
+  const tot=S.p.reduce((a,p)=>a+p.qty,0);
+  return `<h1>Stock</h1><p class="sub">${S.p.length} productos · ${tot} unidades disponibles</p>
+  <div style="margin-bottom:16px"><input id="sq" placeholder="Buscar producto…" value="${esc(q)}" oninput="q=this.value;render(true)"></div>
+  ${l.length?`<div class="grid">${l.map(p=>`<div class="card"><div class="ph" style="cursor:default">${p.img?`<img src="${p.img}" alt="${esc(p.title)}">`:'Sin foto'}</div>
+  <div class="body"><strong>${esc(p.title)}</strong><span style="color:var(--mut);font-size:13px">${esc(p.desc)}</span>
+  <div class="row sp"><span>${money(p.price)}</span>${p.qty===0?'<span class="tag low">Agotado</span>':p.qty<=5?'<span class="tag low">Poco stock</span>':''}</div>
+  <div class="row sp"><span><span class="qty">${p.qty}</span> <span style="color:var(--mut)">quedan</span></span>
+  <span class="row"><button class="btn ghost sm" onclick="adj(${p.id},-1)" aria-label="Restar">−</button><button class="btn ghost sm" onclick="adj(${p.id},1)" aria-label="Sumar">+</button></span></div>
+  <button class="btn danger sm" onclick="delP(${p.id})">Eliminar</button></div></div>`).join('')}</div>`
+  :`<p class="sub">${S.p.length?'No hay resultados.':'Aún no hay productos. Agrégalos desde Inventario.'}</p>`}`}
+function viewCli(){
+  return `<h1>Clientes</h1><p class="sub">Asigna productos a cada cliente; el stock se descuenta y se guarda la hora.</p>
+  <div class="card" style="padding:14px;margin-bottom:18px"><div class="f2"><input id="cn" placeholder="Nombre del cliente"><input id="ct" placeholder="Teléfono (opcional)"></div>
+  <div style="margin-top:10px"><button class="btn" onclick="addC()">Agregar cliente</button></div></div>
+  ${S.c.length?S.c.map(c=>{const as=S.a.filter(a=>a.cid===c.id);const tot=as.reduce((s,a)=>s+a.qty*a.price,0);
+  return `<div class="card" style="padding:14px;margin-bottom:14px"><div class="row sp"><div><h3>${esc(c.name)}</h3><span style="color:var(--mut);font-size:13px">${esc(c.tel)}${as.length?' · Total '+money(tot):''}</span></div><button class="btn danger sm" onclick="delC(${c.id})">Eliminar</button></div>
+  <div class="row" style="margin:12px 0"><select id="sp${c.id}" style="flex:2;min-width:160px">${S.p.map(p=>`<option value="${p.id}" ${p.qty?'':'disabled'}>${esc(p.title)} (${p.qty})</option>`).join('')||'<option value="">Sin productos</option>'}</select>
+  <input id="sq${c.id}" type="number" min="1" value="1" style="flex:1;min-width:70px"><button class="btn" onclick="assign(${c.id})">Asignar</button></div>
+  ${as.map(a=>{const p=S.p.find(x=>x.id===a.pid);return `<div class="asg">${p&&p.img?`<img src="${p.img}" alt="">`:''}<div style="flex:1"><strong>${a.qty} × ${esc(p?p.title:'(producto eliminado)')}</strong><br><span style="color:var(--mut)">${fmt(a.t)}</span></div><span>${money(a.qty*a.price)}</span></div>`}).join('')}</div>`}).join(''):'<p class="sub">Aún no hay clientes.</p>'}`}
+function render(keep){
+  const a=$('#app');
+  if(!auth){a.innerHTML=`<div id="login"><div class="lbox"><h1>Semillas y Manías</h1><p class="sub" style="margin:0">Acceso del administrador</p>
+  <input id="u" placeholder="Usuario" autocomplete="username"><input id="p" type="password" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+  <div class="err">${err}</div><button class="btn" onclick="login()">Entrar</button></div></div>`;return}
+  const items=[['inv','Inventario'],['stock','Stock'],['cli','Clientes']];
+  const f=keep&&document.activeElement&&document.activeElement.id==='sq';
+  a.innerHTML=`<header><h2>Semillas y Manías</h2><div class="menu"><button onclick="menu=!menu;render()" aria-expanded="${menu}">☰ Menú</button>
+  <div class="drop ${menu?'open':''}">${items.map(([k,n])=>`<button class="${page===k?'on':''}" onclick="go('${k}')">${n}</button>`).join('')}<button onclick="logout()">Cerrar sesión</button></div></div></header>
+  <main>${page==='inv'?viewInv():page==='stock'?viewStock():viewCli()}</main>`;
+  if(f){const i=$('#sq');i.focus();i.setSelectionRange(q.length,q.length)}
+}
+render();
+</script>
+</body>
+</html>
